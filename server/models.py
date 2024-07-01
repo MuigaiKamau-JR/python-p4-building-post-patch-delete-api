@@ -23,8 +23,16 @@ class Game(db.Model, SerializerMixin):
 
     reviews = db.relationship('Review', backref='game')
 
-    def __repr__(self):
-        return f'<Game {self.title} for {self.platform}>'
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'genre': self.genre,
+            'platform': self.platform,
+            'price': self.price,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
+        }
 
 class Review(db.Model, SerializerMixin):
     __tablename__ = 'reviews'
@@ -40,8 +48,19 @@ class Review(db.Model, SerializerMixin):
     game_id = db.Column(db.Integer, db.ForeignKey('games.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
-    def __repr__(self):
-        return f'<Review ({self.id}) of {self.game}: {self.score}/10>'
+    game = db.relationship('Game', backref='reviews')
+    user = db.relationship('User', backref='reviews')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'score': self.score,
+            'comment': self.comment,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat(),
+            'game_id': self.game_id,
+            'user_id': self.user_id
+        }
 
 class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
@@ -55,3 +74,11 @@ class User(db.Model, SerializerMixin):
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())
 
     reviews = db.relationship('Review', backref='user')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
+        }
